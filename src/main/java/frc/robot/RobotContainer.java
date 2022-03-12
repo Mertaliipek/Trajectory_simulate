@@ -94,12 +94,22 @@ public class RobotContainer {
     TrajectoryGenerator.generateTrajectory(
       new Pose2d(7.708452,2.252027, Rotation2d.fromDegrees(0)),
       List.of(new Translation2d(7.394167,0.575839)),
-      new Pose2d(7.708452, 2.252027, Rotation2d.fromDegrees(0)),  // x de gideceği kısım, y de gideceği kısım
+      new Pose2d(7.708452, 2.252027, Rotation2d.fromDegrees(0)),  // x , y
       new TrajectoryConfig(Units.feetToMeters(3.0), Units.feetToMeters(3.0)));
+    
+      Trajectory m_trajectory2 =
+      TrajectoryGenerator.generateTrajectory(
+        new Pose2d(7.708452,2.252027, Rotation2d.fromDegrees(0)),
+        List.of(new Translation2d(5.110956,2.086360),new Translation2d(1.426664,1.424512)),
+        new Pose2d(7.708452, 2.252027, Rotation2d.fromDegrees(0)),  // x , y
+        new TrajectoryConfig(Units.feetToMeters(3.0), Units.feetToMeters(3.0)));
+
+
+
 
 /*new Pose2d(1.418903,1.474303, Rotation2d.fromDegrees(0)),
       List.of(new Translation2d(5.034577, 2.099259)),
-      new Pose2d(7.416237, 0.586639, Rotation2d.fromDegrees(0)),  // x de gideceği kısım, y de gideceği kısım
+      new Pose2d(7.416237, 0.586639, Rotation2d.fromDegrees(0)),  // x , y
       new TrajectoryConfig(Units.feetToMeters(3.0), Units.feetToMeters(3.0)));
 */
 
@@ -109,11 +119,13 @@ public class RobotContainer {
 
 // Create and push Field2d to SmartDashboard.
 Field2d m_field = new Field2d();
+Field2d m_field2 = new Field2d();
 SmartDashboard.putData(m_field);
+SmartDashboard.putData(m_field2);
 
 // Push the trajectory to Field2d.
-m_field.getObject("traj").setTrajectory(m_trajectory);
-
+m_field.getObject("Path").setTrajectory(m_trajectory);
+m_field.getObject("Enco-Gyro").setTrajectory(m_trajectory2);
     // An ExampleCommand will run in autonomous
     return new SequentialCommandGroup( //
     new PidCommand(m_drive, 10),
