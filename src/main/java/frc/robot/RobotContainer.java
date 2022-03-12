@@ -4,10 +4,21 @@
 
 package frc.robot;
 
+import java.util.List;
+
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.KinematicCmd;
 import frc.robot.commands.OdometryCmd;
 import frc.robot.commands.PidCommand;
@@ -61,7 +72,6 @@ public class RobotContainer {
     );
 
 
-
   }
 
   /**
@@ -79,6 +89,31 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+
+    Trajectory m_trajectory =
+    TrajectoryGenerator.generateTrajectory(
+      new Pose2d(7.708452,2.252027, Rotation2d.fromDegrees(0)),
+      List.of(new Translation2d(7.394167,0.575839)),
+      new Pose2d(7.708452, 2.252027, Rotation2d.fromDegrees(0)),  // x de gideceği kısım, y de gideceği kısım
+      new TrajectoryConfig(Units.feetToMeters(3.0), Units.feetToMeters(3.0)));
+
+/*new Pose2d(1.418903,1.474303, Rotation2d.fromDegrees(0)),
+      List.of(new Translation2d(5.034577, 2.099259)),
+      new Pose2d(7.416237, 0.586639, Rotation2d.fromDegrees(0)),  // x de gideceği kısım, y de gideceği kısım
+      new TrajectoryConfig(Units.feetToMeters(3.0), Units.feetToMeters(3.0)));
+*/
+
+
+
+
+
+// Create and push Field2d to SmartDashboard.
+Field2d m_field = new Field2d();
+SmartDashboard.putData(m_field);
+
+// Push the trajectory to Field2d.
+m_field.getObject("traj").setTrajectory(m_trajectory);
+
     // An ExampleCommand will run in autonomous
     return new SequentialCommandGroup( //
     new PidCommand(m_drive, 10),
