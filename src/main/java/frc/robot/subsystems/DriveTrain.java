@@ -19,6 +19,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.util.Units;
 /*import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -26,6 +27,7 @@ import edu.wpi.first.math.util.Units;
 */import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
@@ -50,10 +52,12 @@ public class DriveTrain extends SubsystemBase {
   private final MotorController m_rightLeader = new Victor(3);
   private final MotorController m_rightFollower = new Victor(4);
 
+
   
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
   private Encoder encoder = new Encoder(5,7, false, EncodingType.k4X);
+
 
 
   private Field2d m_field = new Field2d();
@@ -63,7 +67,8 @@ public class DriveTrain extends SubsystemBase {
   private final MotorControllerGroup m_rightGroup =
       new MotorControllerGroup(m_rightLeader, m_rightFollower);
   
-  private final AHRS gyro = new AHRS(Port.kMXP);
+      private final DifferentialDrive m_drive = new DifferentialDrive(m_leftGroup, m_rightGroup);
+      private final AHRS gyro = new AHRS(Port.kMXP);
 
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);  //double ks, double kv
 
@@ -71,6 +76,8 @@ public class DriveTrain extends SubsystemBase {
       new DifferentialDriveKinematics(kTrackWidth);
 
   double kP;
+
+  Pose2d pose = new Pose2d();
 
 
   private final double kDriveTick2Feet = 1.0 / 128 * 6 * Math.PI / 12;
@@ -105,18 +112,49 @@ public class DriveTrain extends SubsystemBase {
     m_rightGroup.setVoltage(rightOutput + rightFeedforward);
   }
 
+  public DifferentialDriveWheelSpeeds getSpeeds() {
+    return new DifferentialDriveWheelSpeeds(
+    m_leftEncoder.getDistance() / 7.39 * 2 * Math.PI * Units.inchesToMeters(3) / 60,
+    m_rightEncoder.getDistance() / 7.39 * 2 * Math.PI * Units.inchesToMeters(3) / 60
+    );
+  }
+
+
   public void drive(double xSpeed, double rot) {  // xSpeed Linear velocity in m/s.   rot Angular velocity in rad/s.
     var wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0.0, rot));  // omegaRadiansPerSecond , vxMetersPerSecond , 	vyMetersPerSecond
     setSpeeds(wheelSpeeds);
   }
 
-  public void odometryUpdate() {
-    m_odometry.update(
-      Rotation2d.fromDegrees(gyro.getYaw())  /*gyro.getRotation2d()*/  , m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
-
+  public void setOutputVolts(double leftVolts, double rightVolts) {
+    m_leftGroup.set(leftVolts / 12);
+    m_rightGroup.set(rightVolts / 12);
   }
 
 
+  public void odometryUpdate() {
+   pose = m_odometry.update(
+      Rotation2d.fromDegrees(gyro.getYaw())  /*gyro.getRotation2d()*/  , m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+
+  }
+  public Pose2d getPose() {
+    return pose;
+  }
+
+  public SimpleMotorFeedforward returnFeedforward() {
+    return m_feedforward;
+  }
+
+  public DifferentialDriveKinematics getKinematics() {
+    return m_kinematics;
+  }
+
+  public PIDController getLeftPidController() {
+    return m_leftPIDController;
+  }
+  public PIDController getRightPidController() {
+    return m_rightPIDController;
+  }
+  
   public void pidTest(double setPoint) {
 
     double sensorPosition = encoder.get() * kDriveTick2Feet;
@@ -155,19 +193,22 @@ public class DriveTrain extends SubsystemBase {
 
     // Push the trajectory to Field2d.
    // m_field.getObject("traj").setTrajectory(m_trajectory);
-  
-
-
-
-
-
 
 }
-
-
+public void resetOdometry(Pose2d pose) {
+  m_leftEncoder.reset();
+  m_rightEncoder.reset();
+  m_odometry.resetPosition(pose, gyro.getRotation2d());
+}
+public void tankDriveVolts(double leftVolts, double rightVolts) {
+  m_leftGroup.setVoltage(leftVolts);
+  m_rightGroup.setVoltage(rightVolts);
+  m_drive.feed();
+}
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
+
 }

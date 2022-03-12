@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.util.List;
 
+import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,6 +25,7 @@ import frc.robot.commands.OdometryCmd;
 import frc.robot.commands.PidCommand;
 import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /**
@@ -105,8 +107,6 @@ public class RobotContainer {
         new TrajectoryConfig(Units.feetToMeters(3.0), Units.feetToMeters(3.0)));
 
 
-
-
 /*new Pose2d(1.418903,1.474303, Rotation2d.fromDegrees(0)),
       List.of(new Translation2d(5.034577, 2.099259)),
       new Pose2d(7.416237, 0.586639, Rotation2d.fromDegrees(0)),  // x , y
@@ -116,21 +116,32 @@ public class RobotContainer {
 
 
 
-
 // Create and push Field2d to SmartDashboard.
 Field2d m_field = new Field2d();
 Field2d m_field2 = new Field2d();
+
 SmartDashboard.putData(m_field);
 SmartDashboard.putData(m_field2);
 
 // Push the trajectory to Field2d.
 m_field.getObject("Path").setTrajectory(m_trajectory);
-//m_field.getObject("Enco-Gyro").setTrajectory(m_trajectory2);
+m_field.getObject("Enco-Gyro").setTrajectory(m_trajectory2);
     // An ExampleCommand will run in autonomous
-    return new SequentialCommandGroup( //
-    new PidCommand(m_drive, 10),
-    new KinematicCmd(m_drive, xSpeed, rot)); // kino
+
+
+
+    new PidCommand(m_drive, 10);
+    return new KinematicCmd(m_drive, xSpeed, rot);
+  
+
+  
+
+
+
+    
+    //return command.andThen(() -> m_drive.setOutputVolts(0, 0));  
   }
 
 
 }
+
