@@ -19,7 +19,10 @@
         },
         "Path": {
           "arrowSize": 0,
-          "style": "Line (Closed)"
+          "style": "Line"
+        },
+        "Robot": {
+          "arrowSize": 0
         },
         "image": "C:\\Users\\user\\Desktop\\Ekran Alıntısı.PNG",
         "window": {

@@ -91,10 +91,10 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
 
     Trajectory m_trajectory =
-    TrajectoryGenerator.generateTrajectory(
-      new Pose2d(7.708452,2.252027, Rotation2d.fromDegrees(0)),
-      List.of(new Translation2d(7.394167,0.575839)),
-      new Pose2d(7.708452, 2.252027, Rotation2d.fromDegrees(0)),  // x , y
+    TrajectoryGenerator.generateTrajectory(                  // 90
+      new Pose2d(7.375276,2.200692, Rotation2d.fromDegrees(-80)),
+      List.of(new Translation2d(7.375276,0.650519)),
+      new Pose2d(6.920915, 2.641690, Rotation2d.fromDegrees(0)),  // x , y
       new TrajectoryConfig(Units.feetToMeters(3.0), Units.feetToMeters(3.0)));
     
       Trajectory m_trajectory2 =
@@ -125,7 +125,7 @@ SmartDashboard.putData(m_field2);
 
 // Push the trajectory to Field2d.
 m_field.getObject("Path").setTrajectory(m_trajectory);
-m_field.getObject("Enco-Gyro").setTrajectory(m_trajectory2);
+//m_field.getObject("Enco-Gyro").setTrajectory(m_trajectory2);
     // An ExampleCommand will run in autonomous
     return new SequentialCommandGroup( //
     new PidCommand(m_drive, 10),
